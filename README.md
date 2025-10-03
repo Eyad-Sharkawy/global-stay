@@ -1,7 +1,7 @@
 # 🌍 GlobalStay  
 
 <p align="center">
-  <img src="media/logo.png" alt="GlobalStay Logo" width="400"/>
+  <img src="assets/media/logo.png" alt="GlobalStay Logo" width="400"/>
 </p>
 
 <p align="center">
@@ -67,7 +67,7 @@ It’s designed with elegance, user-friendliness, and functionality in mind.
 
 ## 📸 Logo Preview  
 <p align="center">
-  <img src="media/logo.png" alt="GlobalStay Logo" width="200"/>
+  <img src="assets/media/logo.png" alt="GlobalStay Logo" width="400"/>
 </p>
 
 ---
