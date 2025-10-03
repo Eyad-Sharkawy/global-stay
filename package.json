@@ -1,0 +1,30 @@
+{
+  "name": "globalstay-hotel-booking",
+  "version": "1.0.0",
+  "description": "A modern hotel booking platform with beautiful UI and interactive features",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Static site - no build step required'",
+    "start": "echo 'Static site - serve index.html'",
+    "dev": "echo 'Static site - open index.html in browser'"
+  },
+  "keywords": [
+    "hotel",
+    "booking",
+    "travel",
+    "static-site",
+    "html",
+    "css",
+    "javascript"
+  ],
+  "author": "WEBORA",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/globalstay.git"
+  },
+  "homepage": "https://globalstay.vercel.app"
+}
