@@ -1,0 +1,63 @@
+name: Sync Upstream Repository
+
+on:
+  schedule:
+    # Run every 6 hours to check for updates
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Allow manual triggering
+  push:
+    branches: [ main ]
+
+jobs:
+  sync-upstream:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+
+    - name: Configure Git
+      run: |
+        git config --global user.name "GitHub Actions Bot"
+        git config --global user.email "actions@github.com"
+
+    - name: Add upstream remote
+      run: |
+        git remote add upstream https://github.com/ahmedtolba481/GlOBALSTAY.git || true
+
+    - name: Fetch upstream changes
+      run: |
+        git fetch upstream
+
+    - name: Check if there are updates
+      id: check-updates
+      run: |
+        if git merge-base --is-ancestor upstream/main HEAD; then
+          echo "updates=false" >> $GITHUB_OUTPUT
+        else
+          echo "updates=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Merge upstream changes
+      if: steps.check-updates.outputs.updates == 'true'
+      run: |
+        git checkout main
+        git merge upstream/main --no-edit
+        git push origin main
+
+    - name: Create summary
+      if: steps.check-updates.outputs.updates == 'true'
+      run: |
+        echo "## 🔄 Automatic Sync Complete" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Successfully synced updates from upstream repository" >> $GITHUB_STEP_SUMMARY
+        echo "🚀 Changes have been pushed to your fork" >> $GITHUB_STEP_SUMMARY
+        echo "📦 Vercel will automatically deploy the updates" >> $GITHUB_STEP_SUMMARY
+
+    - name: No updates available
+      if: steps.check-updates.outputs.updates == 'false'
+      run: |
+        echo "## ℹ️ No Updates Available" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Your fork is already up to date with upstream" >> $GITHUB_STEP_SUMMARY
