@@ -1,10 +1,11 @@
 name: Auto Deploy to Vercel
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+# Disabled - Using Vercel's automatic deployment instead
+# on:
+#   push:
+#     branches: [ main ]
+#   pull_request:
+#     branches: [ main ]
 
 jobs:
   deploy:
@@ -19,21 +20,17 @@ jobs:
       with:
         node-version: '18'
 
-    - name: Install dependencies (if package.json exists)
+    - name: Validate static files
       run: |
-        if [ -f package.json ]; then
-          npm ci
+        echo "Validating HTML files..."
+        if [ -f index.html ]; then
+          echo "✓ index.html found"
         else
-          echo "No package.json found, skipping dependency installation"
+          echo "✗ index.html not found"
+          exit 1
         fi
-
-    - name: Build project (if build script exists)
-      run: |
-        if [ -f package.json ] && npm run build --if-present; then
-          echo "Build completed"
-        else
-          echo "No build script found, using static files"
-        fi
+        
+        echo "Static site validation complete"
 
     - name: Deploy to Vercel
       uses: amondnet/vercel-action@v25

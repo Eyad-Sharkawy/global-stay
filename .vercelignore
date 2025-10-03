@@ -1,0 +1,15 @@
+# Ignore development files
+.idea/
+.github/
+sync-upstream.bat
+sync-upstream.sh
+AUTOMATION.md
+
+# Ignore git files
+.git/
+.gitignore
+
+# Ignore any build artifacts (if any)
+node_modules/
+dist/
+build/
