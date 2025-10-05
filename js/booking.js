@@ -418,7 +418,7 @@ function calculateTotal() {
   `;
 }
 
-const API_BASE = 'http://localhost:4000/api';
+const API_BASE = '/api';
 
 // Handle booking form submission
 function handleBookingSubmit(e) {

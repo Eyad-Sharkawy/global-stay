@@ -1,7 +1,7 @@
 // Authentication Check and User Display
 // Add this script to booking.html and any other pages that require login
 
-const API_BASE = 'http://localhost:4000/api';
+const API_BASE = '/api';
 
 (function() {
   const token = sessionStorage.getItem('token') || localStorage.getItem('token');

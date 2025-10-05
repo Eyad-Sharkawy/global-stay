@@ -5,7 +5,7 @@ document.getElementById("togglePassword").addEventListener("click", function () 
   this.textContent = type === "password" ? "show" : "hide";
 });
 
-const API_BASE = 'http://localhost:4000/api';
+const API_BASE = '/api';
 
 function showMessage(type, message) {
   const messageContainer = document.getElementById("messageContainer");
