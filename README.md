@@ -76,7 +76,7 @@ It’s designed with elegance, user-friendliness, and functionality in mind.
 
 1. Clone the repo  
    ```bash
-   git clone https://github.com/your-username/globalstay.git
+   git clone https://github.com/Eyad-Sharkawy/global-stay.git
 Open index.html in your browser
 
 Customize hotel images, descriptions, and booking data
@@ -93,4 +93,4 @@ Submit a pull request
 📜 License
 This project is licensed under the MIT License.
 
-<p align="center"> Made with ❤️ by <b>WEBORA</b> </p> ```
+<p align="center"> Made with ❤️ by <b>WEBORA</b> </p>
