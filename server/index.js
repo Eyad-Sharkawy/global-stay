@@ -18,10 +18,12 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 4000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/hotelapp';
+const DB_NAME = process.env.DB_NAME; // optional override of db name
 
 async function start() {
   try {
-    await mongoose.connect(MONGODB_URI);
+    const connectOptions = DB_NAME ? { dbName: DB_NAME } : undefined;
+    await mongoose.connect(MONGODB_URI, connectOptions);
     console.log('Connected to MongoDB');
 
     app.get('/health', (req, res) => {
