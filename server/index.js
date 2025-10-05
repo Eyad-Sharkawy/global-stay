@@ -31,15 +31,23 @@ async function start() {
     app.use('/api/auth', authRouter);
     app.use('/api/bookings', bookingRouter);
 
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
+    // Only start a listener when running locally (not in Vercel serverless)
+    if (!process.env.VERCEL) {
+      app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+      });
+    }
   } catch (err) {
     console.error('Failed to start server:', err);
     process.exit(1);
   }
 }
 
-start();
+// Start only in traditional server environments; on Vercel the default export is used
+if (!process.env.VERCEL) {
+  start();
+}
+
+export default app;
 
 
