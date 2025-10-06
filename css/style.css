@@ -145,13 +145,34 @@ body {
   box-shadow: var(--shadow);
   border-radius: 12px;
   padding: 0.5rem 0;
-  margin-top: 0.5rem;
+  margin-top: 0;
   min-width: 180px;
   position: absolute;
   right: 0;
   top: calc(100% + 10px);
   z-index: 9999;
   transform: none;
+}
+
+/* Ensure navbar dropdown overlays and never increases navbar height on small screens */
+@media (max-width: 1199.98px) {
+  .navbar .dropdown-menu {
+    position: fixed;
+    right: 12px;
+    top: 70px; /* approx navbar height */
+    left: auto;
+    bottom: auto;
+    width: auto;
+  }
+  /* Make action buttons expand full width inside burger menu */
+  .navbar-collapse .navbar-nav .nav-item { width: 100%; }
+  .navbar-collapse .navbar-nav .nav-item .btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+  /* Add comfortable spacing between stacked full-width buttons */
+  .navbar-collapse .navbar-nav .nav-item + .nav-item { margin-top: 0.5rem; }
 }
 
 /* Ensure navbar doesn't clip the dropdown */
@@ -362,6 +383,21 @@ body {
 
 .collapsing {
   transition: height 0.3s ease;
+}
+
+/* Profile picture dropdown remove button */
+.dropdown-item.text-danger {
+  transition: all 0.3s ease;
+}
+
+.dropdown-item.text-danger:hover {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545 !important;
+}
+
+.dropdown-item.text-danger:focus {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545 !important;
 }
 
 .profile-picture-upload::after {

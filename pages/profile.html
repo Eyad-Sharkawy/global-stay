@@ -134,6 +134,9 @@
                       <li><a class="dropdown-item" href="#" onclick="document.getElementById('profilePictureInput').click()">
                         <i class="fas fa-upload me-2"></i>Upload Your Own
                       </a></li>
+                      <li><a class="dropdown-item text-danger" href="#" onclick="removeProfilePicture()">
+                        <i class="fas fa-trash me-2"></i>Remove Profile Picture
+                      </a></li>
                     </ul>
                   </div>
                   <input
@@ -163,10 +166,23 @@
               <div
                 class="d-flex justify-content-between align-items-center mb-3"
               >
-                <h5 class="mb-0">My Bookings</h5>
-                <a href="booking.html" class="btn btn-book">New Booking</a>
+                <h5 class="mb-0">Quick Actions</h5>
+                <a href="my-bookings.html" class="btn btn-outline-primary">
+                  <i class="fas fa-calendar me-2"></i>View My Bookings
+                </a>
               </div>
-              <div id="bookingsList"></div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <a href="booking.html" class="btn btn-book w-100">
+                    <i class="fas fa-plus me-2"></i>New Booking
+                  </a>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <a href="my-bookings.html" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-list me-2"></i>Manage Bookings
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -175,6 +191,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/auth-utils.js"></script>
     <script src="../js/auth-check.js"></script>
     <script src="../js/profile.js"></script>
     <script>
@@ -195,24 +212,29 @@
         
         if (!profileUserName) return;
 
-        // Get user data from localStorage
-        let userData = {};
-        const possibleKeys = ['userData', 'user', 'currentUser', 'loggedInUser', 'userInfo'];
-        for (let key of possibleKeys) {
-          const data = localStorage.getItem(key);
-          if (data) {
-            try {
-              userData = JSON.parse(data);
-              break;
-            } catch (e) {
-              // Continue to next key
+        let firstName = '';
+        let lastName = '';
+
+        // Try to get user data from the new authentication system
+        try {
+          if (typeof AuthUtils !== 'undefined' && AuthUtils.getCurrentUserData) {
+            const userData = AuthUtils.getCurrentUserData();
+            if (userData) {
+              firstName = userData.firstName || '';
+              lastName = userData.lastName || '';
             }
           }
+        } catch (error) {
+          console.log('AuthUtils not available, using fallback');
         }
 
-        // Get first and last name
-        const firstName = userData.firstName || userData.first_name || localStorage.getItem('userFirstName');
-        const lastName = userData.lastName || userData.last_name || localStorage.getItem('userLastName');
+        // Fallback to sessionStorage/localStorage
+        if (!firstName) {
+          firstName = sessionStorage.getItem('userFirstName') || localStorage.getItem('userFirstName') || '';
+        }
+        if (!lastName) {
+          lastName = sessionStorage.getItem('userLastName') || localStorage.getItem('userLastName') || '';
+        }
 
         // Display full name
         if (firstName && lastName) {
@@ -359,9 +381,17 @@
         if (!navbarProfileIconImage || !navbarProfileIconFallback) return;
 
         if (imageSrc) {
-          // Show uploaded image in navbar
+          // Show uploaded image in navbar with correct sizing
           navbarProfileIconImage.src = imageSrc;
           navbarProfileIconImage.style.display = 'block';
+          navbarProfileIconImage.style.width = '18px';
+          navbarProfileIconImage.style.height = '18px';
+          navbarProfileIconImage.style.objectFit = 'cover';
+          navbarProfileIconImage.style.position = 'absolute';
+          navbarProfileIconImage.style.top = '50%';
+          navbarProfileIconImage.style.left = '50%';
+          navbarProfileIconImage.style.transform = 'translate(-50%, -50%)';
+          navbarProfileIconImage.style.borderRadius = '50%';
           navbarProfileIconFallback.style.display = 'none';
         } else if (iconClass) {
           // Show preset icon in navbar
@@ -419,6 +449,48 @@
         }
       }
 
+      // Remove profile picture
+      function removeProfilePicture() {
+        const profilePicture = document.getElementById('profilePicture');
+        const profilePictureIcon = document.getElementById('profilePictureIcon');
+        
+        // Hide the uploaded image
+        profilePicture.src = '';
+        profilePicture.style.display = 'none';
+        
+        // Show the default icon
+        profilePictureIcon.style.display = 'block';
+        profilePictureIcon.className = 'fas fa-user';
+        profilePictureIcon.style.fontSize = '28px';
+        profilePictureIcon.style.color = 'var(--primary)';
+        profilePictureIcon.style.position = 'relative';
+        profilePictureIcon.style.zIndex = '1';
+        
+        // Clear saved data from localStorage
+        localStorage.removeItem('profilePicture');
+        localStorage.removeItem('profilePictureIcon');
+        localStorage.removeItem('profilePictureType');
+        
+        // Update navbar profile icon to default
+        updateNavbarProfileIcon(null, 'fas fa-user');
+        
+        // Close the dropdown
+        const dropdownElement = document.getElementById('profilePictureMainDropdown');
+        const dropdown = bootstrap.Dropdown.getInstance(dropdownElement) || new bootstrap.Dropdown(dropdownElement);
+        dropdown.hide();
+        
+        // Show a brief confirmation message
+        const originalText = document.querySelector('[onclick="removeProfilePicture()"]').innerHTML;
+        const removeButton = document.querySelector('[onclick="removeProfilePicture()"]');
+        removeButton.innerHTML = '<i class="fas fa-check me-2"></i>Removed!';
+        removeButton.classList.add('text-success');
+        
+        setTimeout(() => {
+          removeButton.innerHTML = originalText;
+          removeButton.classList.remove('text-success');
+        }, 2000);
+      }
+
       // Generate time-based welcome message
       function updateWelcomeMessage() {
         const now = new Date();
@@ -443,7 +515,7 @@
           subtext = "Sweet dreams and see you tomorrow";
         }
         
-        // Get user's name from the profile display or localStorage
+        // Get user's name from the profile display or authentication system
         const profileNameElement = document.getElementById('profileName');
         let userName = 'Guest';
         
@@ -453,26 +525,25 @@
           // Extract just the first name
           userName = fullName.split(' ')[0];
         } else {
-          // Try to get first name from localStorage with comprehensive checking
-          let userData = {};
-          const possibleKeys = ['userData', 'user', 'currentUser', 'loggedInUser', 'userInfo'];
-          for (let key of possibleKeys) {
-            const data = localStorage.getItem(key);
-            if (data) {
-              try {
-                userData = JSON.parse(data);
-                break;
-              } catch (e) {
-                // Continue to next key
+          // Try to get user data from the new authentication system
+          try {
+            if (typeof AuthUtils !== 'undefined' && AuthUtils.getCurrentUserData) {
+              const userData = AuthUtils.getCurrentUserData();
+              if (userData && userData.firstName) {
+                userName = userData.firstName;
               }
             }
+          } catch (error) {
+            console.log('AuthUtils not available, using fallback');
           }
-          
-          // Try different first name fields
-          userName = userData.firstName || userData.first_name || 
-                    localStorage.getItem('firstName') || 
-                    localStorage.getItem('first_name') || 
-                    localStorage.getItem('userFirstName') || 'Guest';
+
+          // Fallback to sessionStorage/localStorage
+          if (userName === 'Guest') {
+            const firstName = sessionStorage.getItem('userFirstName') || localStorage.getItem('userFirstName');
+            if (firstName) {
+              userName = firstName;
+            }
+          }
         }
         
         welcomeText.textContent = `${greeting} ${userName}!`;
@@ -481,63 +552,57 @@
 
       // Load profile data
       function loadProfileData() {
-        // Get user data from localStorage - check multiple possible keys
-        let userData = {};
-        
-        // Try different localStorage keys where user data might be stored
-        const possibleKeys = ['userData', 'user', 'currentUser', 'loggedInUser', 'userInfo'];
-        for (let key of possibleKeys) {
-          const data = localStorage.getItem(key);
-          if (data) {
-            try {
-              userData = JSON.parse(data);
-              console.log('Found user data in key:', key, userData);
-              break;
-            } catch (e) {
-              console.log('Failed to parse data from key:', key);
+        let firstName = '';
+        let lastName = '';
+        let email = '';
+
+        // Try to get user data from the new authentication system
+        try {
+          if (typeof AuthUtils !== 'undefined' && AuthUtils.getCurrentUserData) {
+            const userData = AuthUtils.getCurrentUserData();
+            if (userData) {
+              firstName = userData.firstName || '';
+              lastName = userData.lastName || '';
+              email = userData.email || '';
             }
           }
+        } catch (error) {
+          console.log('AuthUtils not available, using fallback');
         }
-        
-        // Also check for individual fields in localStorage
-        const firstName = localStorage.getItem('firstName') || localStorage.getItem('first_name') || localStorage.getItem('userFirstName');
-        const lastName = localStorage.getItem('lastName') || localStorage.getItem('last_name') || localStorage.getItem('userLastName');
-        const email = localStorage.getItem('email') || localStorage.getItem('userEmail');
+
+        // Fallback to sessionStorage/localStorage
+        if (!firstName) {
+          firstName = sessionStorage.getItem('userFirstName') || localStorage.getItem('userFirstName') || '';
+        }
+        if (!lastName) {
+          lastName = sessionStorage.getItem('userLastName') || localStorage.getItem('userLastName') || '';
+        }
+        if (!email) {
+          email = sessionStorage.getItem('userEmail') || localStorage.getItem('userEmail') || '';
+        }
         
         const profileName = document.getElementById('profileName');
         const profileEmail = document.getElementById('profileEmail');
         
-        // Set profile information
+        // Set profile information (avoid literal null/undefined)
         if (profileName) {
+          const safeFirst = (firstName === null || firstName === undefined || firstName === 'null' || firstName === 'undefined') ? '' : firstName;
+          const safeLast = (lastName === null || lastName === undefined || lastName === 'null' || lastName === 'undefined') ? '' : lastName;
           let fullName = '';
           
-          // Try to get name from userData object
-          if (userData.firstName && userData.lastName) {
-            fullName = userData.firstName + ' ' + userData.lastName;
-          } else if (userData.first_name && userData.last_name) {
-            fullName = userData.first_name + ' ' + userData.last_name;
-          } else if (userData.name) {
-            fullName = userData.name;
-          } else if (userData.fullName) {
-            fullName = userData.fullName;
-          }
-          // Try individual localStorage fields
-          else if (firstName && lastName) {
-            fullName = firstName + ' ' + lastName;
-          }
-          
-          // Final fallback
-          if (!fullName || fullName.trim() === '') {
+          if (safeFirst && safeLast) {
+            fullName = safeFirst + ' ' + safeLast;
+          } else if (safeFirst) {
+            fullName = safeFirst;
+          } else {
             fullName = 'Guest User';
           }
           
           profileName.textContent = fullName.trim();
-          console.log('Set profile name to:', fullName.trim());
         }
         
         if (profileEmail) {
-          const userEmail = userData.email || email || 'No email provided';
-          profileEmail.textContent = userEmail;
+          profileEmail.textContent = email || 'No email provided';
         }
         
         // Update welcome message after profile data is loaded
