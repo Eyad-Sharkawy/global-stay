@@ -242,6 +242,44 @@ body {
   background-color: var(--primary-dark) !important;
 }
 
+/* Navbar profile icon container */
+.profile-icon-container {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: var(--primary) !important;
+  position: relative !important;
+}
+
+.profile-icon-container img {
+  width: 18px !important;
+  height: 18px !important;
+  object-fit: cover !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  border-radius: 50% !important;
+  z-index: 2 !important;
+}
+
+.profile-icon-container i {
+  color: white !important;
+  font-size: 18px !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
 .profile-picture-upload {
   position: relative;
   display: inline-block;
